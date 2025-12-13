@@ -1,134 +1,116 @@
 import React from "react";
 import {
   Search,
-  Store,
-  Warehouse,
-  QrCode,
-  Sticker,
   Boxes,
+  Cpu,
+  QrCode,
   Truck,
-  Globe,
+  Globe2,
+  ShieldCheck,
+  Receipt,
+  Rocket,
   MessageSquare,
-  Mail,
+  Store,
+  Upload,
+  Settings,
+  PackageSearch,
+  Database,
   ChevronRight,
 } from "lucide-react";
 
-const EMAIL_DEMO = "demo@partagos.nl";
-const EMAIL_INFO = "info@partagos.nl";
-
 export default function App() {
   return (
-    <div style={page}>
-      {/* TOP BAR */}
-      <header style={topBar}>
-        <div style={containerWide}>
-          <div style={brandRow}>
-            <div style={logoDot} />
-            <div>
-              <div style={brandName}>Partagos</div>
-              <div style={brandTag}>AI-gedreven SaaS • Operationeel platform</div>
-            </div>
+    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      {/* HEADER */}
+      <header className="sticky top-0 z-20 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500" />
+            <span className="font-semibold tracking-tight">Partagos</span>
+            <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300">
+              AI Parts Platform
+            </span>
           </div>
 
-          <nav style={nav}>
-            <a style={navLink} href="#pool">
-              Zoekpool
-            </a>
-            <a style={navLink} href="#warehouse">
-              Magazijn & Labels
-            </a>
-            <a style={navLink} href="#channels">
-              Kanalen
-            </a>
-            <a style={navLink} href="#contact">
-              Contact
-            </a>
+          <nav className="hidden md:flex items-center gap-6 text-sm text-neutral-300">
+            <a href="#features" className="hover:text-white">Features</a>
+            <a href="#search" className="hover:text-white">Zoeken</a>
+            <a href="#vendors" className="hover:text-white">Vendors</a>
+            <a href="#pricing" className="hover:text-white">Pricing</a>
+            <a href="#contact" className="hover:text-white">Contact</a>
           </nav>
+
+          {/* LOGIN KNOP */}
+          <a
+            href="/login"
+            className="inline-flex items-center gap-2 text-sm bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-4 py-2 rounded-xl"
+          >
+            Inloggen
+          </a>
         </div>
       </header>
 
       {/* HERO */}
-      <section style={hero}>
-        <div style={container}>
-          <div style={heroGrid}>
-            <div>
-              <div style={pill}>Live • We bouwen door</div>
-              <h1 style={h1}>
-                Eén platform voor{" "}
-                <span style={{ color: GREEN }}>onderdelenbeheer</span> én{" "}
-                <span style={{ color: GREEN }}>verkoop</span>
-              </h1>
-              <p style={lead}>
-                Partagos combineert flexibel magazijnbeheer met een centrale
-                marktplaats: de voorraad van aangesloten bedrijven komt samen in
-                één grote pool — met consumentenprijzen zichtbaar.
-              </p>
+      <section className="relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.15),transparent_50%)]" />
+        <div className="max-w-7xl mx-auto px-4 pt-16 pb-12 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
+              Eén platform voor{" "}
+              <span className="text-emerald-400">auto-onderdelenbeheer</span> én{" "}
+              <span className="text-emerald-400">verkoop</span>
+            </h1>
 
-              <div style={ctaRow}>
-                <a href={`mailto:${EMAIL_DEMO}`} style={btnPrimary}>
-                  <MessageSquare size={18} /> Demo aanvragen
-                </a>
-                <a href={`mailto:${EMAIL_INFO}`} style={btnSecondary}>
-                  <Mail size={18} /> Contact opnemen
-                </a>
-              </div>
+            <p className="mt-4 text-neutral-300 text-lg">
+              Partagos combineert flexibel magazijnbeheer met een centrale
+              zoekpool waarin de voorraad van aangesloten bedrijven samenkomt.
+              Consumentenprijzen zijn openbaar, B2B en export lopen via offerte
+              of contact.
+            </p>
 
-              <div style={trustRow}>
-                <MiniStat label="Sneller verwerken" value="Labels & QR" />
-                <MiniStat label="Meer bereik" value="Centrale pool" />
-                <MiniStat label="Schaalbaar" value="SaaS platform" />
-              </div>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a
+                href="mailto:demo@partagos.nl"
+                className="px-5 py-3 rounded-xl bg-white text-black font-semibold hover:opacity-90"
+              >
+                Demo aanvragen
+              </a>
+              <a
+                href="#features"
+                className="px-5 py-3 rounded-xl bg-neutral-900 border border-neutral-700 hover:border-neutral-500"
+              >
+                Bekijk features
+              </a>
             </div>
+          </div>
 
-            {/* HERO SEARCH MOCK */}
-            <div style={card}>
-              <div style={cardHeader}>
-                <div style={dot} />
-                <div style={cardHeaderText}>Zoek (demo)</div>
+          {/* SEARCH MOCK */}
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-5">
+            <div className="rounded-xl border border-neutral-800 overflow-hidden">
+              <div className="px-4 py-3 bg-neutral-950 text-neutral-300 flex items-center gap-2 text-sm">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                Demo zoeken
               </div>
 
-              <div style={cardBody}>
-                <div style={searchBox}>
-                  <Search size={18} />
+              <div className="p-4" id="search">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950 px-4 py-3">
+                  <Search className="w-5 h-5 text-neutral-400" />
                   <input
-                    style={searchInput}
-                    placeholder="Zoek op kenteken, VIN, motorcode, bakcode of onderdeelnummer…"
-                    readOnly
+                    className="bg-transparent outline-none w-full text-neutral-200 placeholder:text-neutral-500"
+                    placeholder="Zoek op kenteken, VIN, motorcode, bakcode…"
                   />
-                  <button type="button" style={searchBtn}>
+                  <button className="px-3 py-1.5 text-sm rounded-lg bg-emerald-500 text-black font-medium">
                     Zoek
                   </button>
                 </div>
 
-                <div style={result}>
-                  <div style={resultTop}>
-                    <div style={resultBadge}>
-                      <Store size={14} /> Aanbieder
-                    </div>
-                    <div style={priceTag}>€ 349</div>
-                  </div>
-                  <div style={resultTitle}>
+                <div className="mt-4 rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+                  <div className="font-medium">
                     Versnellingsbak DQ400 • bakcode RJW
                   </div>
-                  <div style={resultMeta}>
-                    OE/OEM: 0DD300045K • Motorcode: — • Locatie: B-12 • Voorraad:
-                    1
+                  <div className="text-sm text-neutral-400">
+                    OE: 0DD300045K · Voorraad: 1 · Prijs: €349
                   </div>
-                  <div style={resultActions}>
-                    <a style={miniBtn} href="#pool">
-                      Bekijk in pool
-                      <ChevronRight size={16} />
-                    </a>
-                    <a style={miniBtn2} href={`mailto:${EMAIL_INFO}`}>
-                      Vraag info
-                      <ChevronRight size={16} />
-                    </a>
-                  </div>
-                </div>
-
-                <div style={note}>
-                  Tip: in de echte versie kun je zoeken op meerdere criteria en
-                  zie je meerdere aanbieders per onderdeel.
                 </div>
               </div>
             </div>
@@ -136,418 +118,87 @@ export default function App() {
         </div>
       </section>
 
-      {/* 50/50 SECTION */}
-      <section style={section} id="pool">
-        <div style={container}>
-          <div style={splitGrid}>
-            {/* POOL */}
-            <div style={panel}>
-              <div style={panelIcon}>
-                <Globe size={18} />
-              </div>
-              <h2 style={h2}>Centrale zoekpool voor onderdelen</h2>
-              <p style={p}>
-                De voorraad van aangesloten sloperijen, handelaren en
-                export/import partijen komt samen in één grote pool. Consumenten
-                kunnen vrij zoeken en onderdeelprijzen zijn zichtbaar.
-              </p>
+      {/* FEATURES */}
+      <section id="features" className="max-w-7xl mx-auto px-4 py-12">
+        <h2 className="text-2xl md:text-3xl font-bold">
+          Gebouwd voor de praktijk
+        </h2>
+        <p className="mt-2 text-neutral-300">
+          SaaS-platform met operationele diepgang voor onderdelenbedrijven.
+        </p>
 
-              <ul style={ul}>
-                <li style={li}>
-                  Zoeken op <b>kenteken</b>, <b>VIN</b>, <b>motorcode</b>,{" "}
-                  <b>versnellingsbakcode</b> of <b>onderdeelnummer</b>
-                </li>
-                <li style={li}>
-                  Resultaten van <b>meerdere aanbieders</b> in één overzicht
-                </li>
-                <li style={li}>
-                  B2B / export kan via <b>offerte</b> of <b>contact</b>
-                </li>
-              </ul>
-            </div>
-
-            {/* WAREHOUSE */}
-            <div style={panel} id="warehouse">
-              <div style={panelIcon}>
-                <Warehouse size={18} />
-              </div>
-              <h2 style={h2}>Magazijnbeheer dat zich aanpast aan jouw werkwijze</h2>
-              <p style={p}>
-                Richt je magazijn in zoals jij werkt — zones, stellingen, bakken,
-                pallets. En print per onderdeel precies de informatie die jij
-                nodig hebt: handmatig én automatisch.
-              </p>
-
-              <div style={featureGrid}>
-                <Feature
-                  icon={<Boxes size={18} />}
-                  title="Vrije magazijnstructuur"
-                  text="Meerdere magazijnen, zones en locaties — zonder vaste beperkingen."
-                />
-                <Feature
-                  icon={<Sticker size={18} />}
-                  title="Stickerprofielen"
-                  text="Per bedrijf/rol/proces: magazijn, verkoop, export of kanaal-specifiek."
-                />
-                <Feature
-                  icon={<QrCode size={18} />}
-                  title="QR als sleutel"
-                  text="Scan → direct product, locatie, status en historie."
-                />
-                <Feature
-                  icon={<Truck size={18} />}
-                  title="Handmatig + automatisch"
-                  text="On-demand print of automatische prints bij aanmaak/import/status."
-                />
-              </div>
-            </div>
-          </div>
+        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Feature icon={<Boxes />} title="Centrale onderdelenpool" />
+          <Feature icon={<QrCode />} title="Labels & QR-codes" />
+          <Feature icon={<Cpu />} title="AI ondersteuning" />
+          <Feature icon={<Truck />} title="Export & verzending" />
+          <Feature icon={<ShieldCheck />} title="Rollen & rechten" />
+          <Feature icon={<Receipt />} title="Offertes & facturen" />
+          <Feature icon={<Rocket />} title="Schaalbaar SaaS" />
+          <Feature icon={<Globe2 />} title="Meertalig & multi-tenant" />
         </div>
       </section>
 
-      {/* CHANNELS */}
-      <section style={sectionAlt} id="channels">
-        <div style={container}>
-          <h2 style={h2}>Eén keer toevoegen, meerdere kanalen</h2>
-          <p style={p}>
-            Partagos is gebouwd om voorraad en verkoop te schalen. Vanuit één
-            productbeheer kun je publicatie naar meerdere verkoopkanalen
-            automatiseren (module in opbouw).
+      {/* VENDORS */}
+      <section id="vendors" className="max-w-7xl mx-auto px-4 py-12">
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6">
+          <h3 className="text-xl font-bold flex items-center gap-2">
+            <Store /> Vendor portal
+          </h3>
+          <p className="mt-2 text-neutral-300">
+            Leveranciers beheren hun eigen voorraad, die automatisch in de
+            centrale pool verschijnt.
           </p>
+        </div>
+      </section>
 
-          <div style={channelGrid}>
-            <ChannelCard title="Marktplaats" />
-            <ChannelCard title="2dehands" />
-            <ChannelCard title="rrr.lt" />
-            <ChannelCard title="eBay" />
-          </div>
-
-          <div style={roadmapNote}>
-            <b>Roadmap:</b> automatische advertentietemplates, status-sync
-            (verkocht/uitverkocht), prijsregels per kanaal en bulk publishing.
-          </div>
+      {/* PRICING */}
+      <section id="pricing" className="max-w-7xl mx-auto px-4 py-12">
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6">
+          <h3 className="text-xl font-bold">Abonnementen</h3>
+          <p className="mt-2 text-neutral-400 text-sm">
+            Onderdeelprijzen zijn openbaar. Platformprijzen zijn op aanvraag.
+          </p>
         </div>
       </section>
 
       {/* CONTACT */}
-      <section style={section} id="contact">
-        <div style={container}>
-          <div style={contactCard}>
-            <div>
-              <h2 style={{ ...h2, marginTop: 0 }}>Klaar om te starten?</h2>
-              <p style={p}>
-                Vraag een demo aan of neem contact op. We kunnen je eerste
-                dataset/voorraad direct meenemen in de onboarding.
-              </p>
-              <div style={ctaRow}>
-                <a href={`mailto:${EMAIL_DEMO}`} style={btnPrimary}>
-                  <MessageSquare size={18} /> Demo aanvragen
-                </a>
-                <a href={`mailto:${EMAIL_INFO}`} style={btnSecondary}>
-                  <Mail size={18} /> Contact opnemen
-                </a>
-              </div>
-              <div style={contactMeta}>
-                Demo: <a href={`mailto:${EMAIL_DEMO}`}>{EMAIL_DEMO}</a> • Info:{" "}
-                <a href={`mailto:${EMAIL_INFO}`}>{EMAIL_INFO}</a>
-              </div>
-            </div>
-
-            <div style={miniChecklist}>
-              <div style={checkTitle}>Wat je vandaag al live hebt</div>
-              <div style={checkItem}>• Professionele landing (SaaS + operatie)</div>
-              <div style={checkItem}>• Centrale pool verhaal + USP magazijn/labels</div>
-              <div style={checkItem}>• Demo- & contactflow via e-mail</div>
-              <div style={checkItem}>• Roadmap kanaalpublicatie (zonder loze beloftes)</div>
-            </div>
+      <section id="contact" className="max-w-7xl mx-auto px-4 py-12">
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6">
+          <h3 className="text-xl font-bold">Contact</h3>
+          <p className="mt-1 text-neutral-300">
+            Neem contact op of vraag een demo aan.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <a
+              href="mailto:demo@partagos.nl"
+              className="px-5 py-3 rounded-xl bg-emerald-500 text-black font-semibold"
+            >
+              Demo aanvragen
+            </a>
+            <a
+              href="mailto:info@partagos.nl"
+              className="px-5 py-3 rounded-xl border border-neutral-700"
+            >
+              Contact
+            </a>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer style={footer}>
-        <div style={containerWide}>
-          <div>© {new Date().getFullYear()} Partagos.nl</div>
-          <div style={{ opacity: 0.8 }}>
-            Onderdeelprijzen openbaar (B2C) • Abonnement op aanvraag
-          </div>
-        </div>
+      <footer className="border-t border-neutral-800 py-6 text-center text-sm text-neutral-400">
+        © {new Date().getFullYear()} Partagos.nl — AI-gedreven auto-onderdelenplatform
       </footer>
     </div>
   );
 }
 
-function Feature({ icon, title, text }) {
+function Feature({ icon, title }) {
   return (
-    <div style={featureCard}>
-      <div style={featureIcon}>{icon}</div>
-      <div style={featureTitle}>{title}</div>
-      <div style={featureText}>{text}</div>
+    <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4 flex items-center gap-3">
+      <div className="text-emerald-400">{icon}</div>
+      <div className="font-medium">{title}</div>
     </div>
   );
 }
-
-function ChannelCard({ title }) {
-  return (
-    <div style={channelCard}>
-      <div style={channelTitle}>{title}</div>
-      <div style={channelSub}>Automatische publicatie (module)</div>
-    </div>
-  );
-}
-
-function MiniStat({ label, value }) {
-  return (
-    <div style={miniStat}>
-      <div style={miniStatLabel}>{label}</div>
-      <div style={miniStatValue}>{value}</div>
-    </div>
-  );
-}
-
-/* ---------- Styles (inline, simple & stable) ---------- */
-
-const GREEN = "#16a34a";
-
-const page = {
-  fontFamily: "Arial, sans-serif",
-  color: "#0b0f14",
-  background: "#ffffff",
-};
-
-const topBar = {
-  position: "sticky",
-  top: 0,
-  zIndex: 10,
-  background: "rgba(255,255,255,0.9)",
-  borderBottom: "1px solid #e6e6e6",
-  backdropFilter: "blur(10px)",
-};
-
-const containerWide = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  padding: "14px 20px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: 14,
-};
-
-const container = {
-  maxWidth: 1100,
-  margin: "0 auto",
-  padding: "0 20px",
-};
-
-const brandRow = { display: "flex", alignItems: "center", gap: 12 };
-const logoDot = { width: 12, height: 12, borderRadius: 999, background: GREEN };
-const brandName = { fontWeight: 800, letterSpacing: -0.2, fontSize: 18 };
-const brandTag = { fontSize: 12, opacity: 0.7, marginTop: 2 };
-
-const nav = { display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "flex-end" };
-const navLink = { color: "#0b0f14", textDecoration: "none", fontSize: 13, opacity: 0.8 };
-
-const hero = {
-  padding: "58px 0 28px",
-  background:
-    "radial-gradient(1000px 400px at 20% 0%, rgba(22,163,74,0.14), transparent 60%)",
-};
-
-const heroGrid = {
-  display: "grid",
-  gridTemplateColumns: "1.1fr 0.9fr",
-  gap: 26,
-  alignItems: "start",
-};
-
-const pill = {
-  display: "inline-block",
-  padding: "6px 10px",
-  borderRadius: 999,
-  background: "rgba(22,163,74,0.10)",
-  color: GREEN,
-  fontWeight: 700,
-  fontSize: 12,
-};
-
-const h1 = { fontSize: 44, fontWeight: 900, lineHeight: 1.12, margin: "14px 0 10px", letterSpacing: -0.6 };
-const lead = { fontSize: 16.5, lineHeight: 1.55, maxWidth: 720, margin: "0 0 18px", opacity: 0.9 };
-
-const ctaRow = { display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginTop: 12 };
-
-const btnBase = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 8,
-  padding: "12px 16px",
-  borderRadius: 10,
-  textDecoration: "none",
-  fontWeight: 800,
-  fontSize: 14,
-};
-
-const btnPrimary = { ...btnBase, background: GREEN, color: "#fff", border: "1px solid #0f7a35" };
-const btnSecondary = { ...btnBase, background: "#fff", color: GREEN, border: `2px solid ${GREEN}` };
-
-const trustRow = { display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 10, marginTop: 18 };
-
-const miniStat = { border: "1px solid #e8e8e8", borderRadius: 12, padding: 12, background: "#fff" };
-const miniStatLabel = { fontSize: 12, opacity: 0.65 };
-const miniStatValue = { fontSize: 13.5, fontWeight: 800, marginTop: 6 };
-
-const card = { border: "1px solid #e8e8e8", borderRadius: 16, overflow: "hidden", background: "#fff" };
-const cardHeader = { display: "flex", alignItems: "center", gap: 8, padding: "12px 14px", borderBottom: "1px solid #efefef" };
-const dot = { width: 10, height: 10, borderRadius: 999, background: GREEN };
-const cardHeaderText = { fontSize: 13, fontWeight: 800, opacity: 0.8 };
-const cardBody = { padding: 14 };
-
-const searchBox = {
-  display: "flex",
-  gap: 10,
-  alignItems: "center",
-  border: "1px solid #e6e6e6",
-  borderRadius: 12,
-  padding: "10px 12px",
-  background: "#fafafa",
-};
-
-const searchInput = {
-  border: "none",
-  outline: "none",
-  width: "100%",
-  background: "transparent",
-  fontSize: 13,
-};
-
-const searchBtn = {
-  background: GREEN,
-  color: "#fff",
-  border: "1px solid #0f7a35",
-  borderRadius: 10,
-  padding: "8px 12px",
-  fontWeight: 800,
-  cursor: "pointer",
-};
-
-const result = { marginTop: 12, border: "1px solid #e8e8e8", borderRadius: 12, padding: 12 };
-const resultTop = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 };
-const resultBadge = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  borderRadius: 999,
-  padding: "6px 10px",
-  background: "rgba(22,163,74,0.10)",
-  color: GREEN,
-  fontWeight: 800,
-  fontSize: 12,
-};
-const priceTag = { fontWeight: 900, color: "#0b0f14" };
-const resultTitle = { marginTop: 8, fontWeight: 900 };
-const resultMeta = { marginTop: 6, fontSize: 12.5, opacity: 0.75, lineHeight: 1.4 };
-const resultActions = { marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" };
-
-const miniBtn = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  border: "1px solid #e6e6e6",
-  background: "#fff",
-  borderRadius: 999,
-  padding: "8px 10px",
-  fontWeight: 800,
-  fontSize: 12.5,
-  textDecoration: "none",
-  color: "#0b0f14",
-};
-const miniBtn2 = { ...miniBtn, border: `1px solid ${GREEN}`, color: GREEN };
-
-const note = { marginTop: 10, fontSize: 12.5, opacity: 0.65, lineHeight: 1.4 };
-
-const section = { padding: "56px 0" };
-const sectionAlt = { padding: "56px 0", background: "#f7f7f7" };
-
-const splitGrid = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "stretch" };
-
-const panel = {
-  border: "1px solid #e8e8e8",
-  borderRadius: 16,
-  padding: 18,
-  background: "#fff",
-};
-
-const panelIcon = {
-  width: 36,
-  height: 36,
-  borderRadius: 12,
-  background: "rgba(22,163,74,0.10)",
-  color: GREEN,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const h2 = { fontSize: 26, fontWeight: 900, letterSpacing: -0.4, margin: "12px 0 10px" };
-const p = { fontSize: 14.5, lineHeight: 1.65, opacity: 0.9, margin: 0 };
-
-const ul = { marginTop: 12, paddingLeft: 18, lineHeight: 1.6 };
-const li = { marginTop: 8, fontSize: 14, opacity: 0.9 };
-
-const featureGrid = { marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 };
-const featureCard = { border: "1px solid #ececec", borderRadius: 14, padding: 12, background: "#fff" };
-const featureIcon = { color: GREEN };
-const featureTitle = { marginTop: 8, fontWeight: 900, fontSize: 13.5 };
-const featureText = { marginTop: 6, fontSize: 12.8, opacity: 0.75, lineHeight: 1.45 };
-
-const channelGrid = { marginTop: 16, display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 12 };
-const channelCard = { border: "1px solid #e8e8e8", borderRadius: 16, padding: 14, background: "#fff" };
-const channelTitle = { fontWeight: 900 };
-const channelSub = { marginTop: 6, fontSize: 12.5, opacity: 0.7 };
-
-const roadmapNote = {
-  marginTop: 14,
-  border: "1px dashed #cfd8cf",
-  background: "rgba(22,163,74,0.06)",
-  borderRadius: 16,
-  padding: 14,
-  lineHeight: 1.55,
-  fontSize: 13.5,
-};
-
-const contactCard = {
-  border: "1px solid #e8e8e8",
-  borderRadius: 18,
-  padding: 18,
-  display: "grid",
-  gridTemplateColumns: "1.2fr 0.8fr",
-  gap: 16,
-  background: "#fff",
-};
-
-const contactMeta = { marginTop: 12, fontSize: 13, opacity: 0.75 };
-const miniChecklist = { border: "1px solid #ededed", borderRadius: 16, padding: 14, background: "#fafafa" };
-const checkTitle = { fontWeight: 900, marginBottom: 10 };
-const checkItem = { fontSize: 13.3, opacity: 0.85, marginTop: 8, lineHeight: 1.4 };
-
-const footer = { padding: "18px 0", borderTop: "1px solid #e6e6e6", background: "#fff" };
-
-/* Responsive fallback (simple) */
-const styleTag = document?.getElementById?.("__partagos_style");
-if (!styleTag) {
-  try {
-    const tag = document.createElement("style");
-    tag.id = "__partagos_style";
-    tag.innerHTML = `
-      @media (max-width: 980px) {
-        .__ignore { }
-      }
-    `;
-    document.head.appendChild(tag);
-  } catch {}
-}
-
-/* Notes:
-   - Inline styles keep this Vite MVP stable.
-   - Next step: convert to Tailwind and add NL/EN toggle + real search flow.
-*/
