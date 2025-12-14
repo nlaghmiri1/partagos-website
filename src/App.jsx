@@ -1,8 +1,4 @@
-import { useEffect, useState } from "react";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
-import PublicSearch from "./PublicSearch";
-import AdminCustomers from "./AdminCustomers";
+import React from "react";
 
 function goTo(path) {
   window.history.pushState({}, "", path);
@@ -10,62 +6,97 @@ function goTo(path) {
 }
 
 export default function App() {
-  const [path, setPath] = useState(window.location.pathname);
-
-  useEffect(() => {
-    const onPop = () => setPath(window.location.pathname);
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
-
-  if (path === "/login") return <Login />;
-  if (path === "/dashboard") return <Dashboard />;
-  if (path === "/zoeken") return <PublicSearch />;
-  if (path === "/admin/customers") return <AdminCustomers />;
-
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
-      <div className="bg-white p-10 rounded-2xl shadow max-w-lg w-full text-center">
-        <h1 className="text-3xl font-bold mb-3">Partagos</h1>
+    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      <header className="sticky top-0 z-20 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500" />
+            <div className="font-semibold tracking-tight">Partagos</div>
+            <div className="ml-2 text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300">
+              AI Parts SaaS
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => goTo("/login")}
+              className="px-4 py-2 rounded-xl bg-white text-black font-semibold hover:opacity-90"
+            >
+              Inloggen
+            </button>
+            <a
+              href="mailto:demo@partagos.nl"
+              className="px-4 py-2 rounded-xl border border-neutral-700 hover:border-neutral-500"
+            >
+              Demo aanvragen
+            </a>
+            <a
+              href="mailto:info@partagos.nl"
+              className="px-4 py-2 rounded-xl border border-neutral-700 hover:border-neutral-500"
+            >
+              Contact
+            </a>
+          </div>
+        </div>
+      </header>
 
-        <p className="text-slate-600 mb-8">
-          AI-gedreven SaaS platform voor auto-onderdelen, magazijnbeheer en multi-tenant verkoop.
+      <main className="max-w-6xl mx-auto px-4 py-14">
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
+          Eén platform voor auto-onderdelenbeheer én verkoop
+        </h1>
+        <p className="mt-4 text-neutral-300 text-lg max-w-3xl">
+          Partagos combineert flexibel magazijnbeheer met een centrale zoekpool waarin de voorraad van aangesloten bedrijven samenkomt.
+          Consumentenprijzen voor onderdelen kunnen openbaar, terwijl B2B/export via offerte of contact loopt.
         </p>
 
-        <div className="flex flex-col gap-3">
+        <div className="mt-8 grid md:grid-cols-3 gap-4">
+          <Feature title="Centrale onderdelenpool" desc="Alle aangesloten voorraad in één grote pool." />
+          <Feature title="Labels & QR/barcode" desc="Per klant aanpasbare labels, PDF export en scanning." />
+          <Feature title="Decoder & fitment" desc="Kenteken/VIN → voertuigdata → koppelen aan voorraad." />
+          <Feature title="Marketplaces" desc="Framework voor Marktplaats / eBay / RRR.lt publishing." />
+          <Feature title="Multi-tenant" desc="Meerdere bedrijven, eigen rechten en pakket-limieten." />
+          <Feature title="Schaalbaar SaaS" desc="Starter → Growth → Scale, klaar voor opschaling." />
+        </div>
+
+        <div className="mt-10 flex flex-wrap gap-3">
           <button
             onClick={() => goTo("/login")}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-medium"
+            className="px-5 py-3 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400"
           >
-            Inloggen
+            Naar inloggen
           </button>
-
-          <button
-            onClick={() => goTo("/dashboard")}
-            className="border border-slate-300 hover:bg-slate-50 px-5 py-3 rounded-xl"
+          <a
+            href="mailto:demo@partagos.nl"
+            className="px-5 py-3 rounded-xl bg-neutral-900 border border-neutral-700 hover:border-neutral-500"
           >
-            Ga naar dashboard
-          </button>
-
-          <button
-            onClick={() => goTo("/admin/customers")}
-            className="border border-slate-300 hover:bg-slate-50 px-5 py-3 rounded-xl"
-          >
-            Admin: nieuwe klant aanmaken
-          </button>
-
-          <button
-            onClick={() => goTo("/zoeken")}
-            className="text-emerald-700 underline mt-2"
-          >
-            Publiek onderdelen zoeken
-          </button>
+            Demo aanvragen
+          </a>
         </div>
 
-        <div className="mt-8 text-xs text-slate-400">
-          © {new Date().getFullYear()} Partagos
+        <div className="mt-10 text-sm text-neutral-400">
+          Live terwijl we doorbouwen. Voor toegang: invite-only (accounts worden door Partagos aangemaakt).
         </div>
-      </div>
+      </main>
+
+      <footer className="border-t border-neutral-800">
+        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>© {new Date().getFullYear()} Partagos</div>
+          <div className="flex items-center gap-4">
+            <a className="hover:text-neutral-200" href="mailto:info@partagos.nl">Support</a>
+            <a className="hover:text-neutral-200" href="#">Privacy</a>
+            <a className="hover:text-neutral-200" href="#">Voorwaarden</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function Feature({ title, desc }) {
+  return (
+    <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4">
+      <div className="font-semibold text-emerald-300">{title}</div>
+      <div className="mt-1 text-sm text-neutral-300">{desc}</div>
     </div>
   );
 }
