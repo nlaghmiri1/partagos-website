@@ -1,33 +1,61 @@
-import React from "react";
-
-function goTo(path) {
-  window.history.pushState({}, "", path);
-  window.dispatchEvent(new PopStateEvent("popstate"));
-}
+import { useState } from "react";
+import { supabase } from "./supabaseClient";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+
+  async function login() {
+    setError("");
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + "/dashboard",
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setSent(true);
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="bg-white p-8 rounded-2xl shadow max-w-sm w-full">
-        <h2 className="text-xl font-semibold mb-4">Inloggen bij Partagos</h2>
-
-        <p className="text-sm text-slate-500 mb-6">
-          Demo-omgeving — authenticatie volgt later
+      <div className="bg-white p-8 rounded-2xl shadow w-full max-w-sm">
+        <h2 className="text-xl font-bold mb-2">Inloggen</h2>
+        <p className="text-sm text-slate-500 mb-4">
+          Ontvang een magische login-link per e-mail
         </p>
 
-        <button
-          onClick={() => goTo("/dashboard")}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl"
-        >
-          Ga naar dashboard
-        </button>
+        {sent ? (
+          <p className="text-emerald-600 text-sm">
+            Check je e-mail voor de login-link.
+          </p>
+        ) : (
+          <>
+            <input
+              type="email"
+              placeholder="jij@bedrijf.nl"
+              className="w-full border rounded-xl px-4 py-2 mb-3"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-        <button
-          onClick={() => goTo("/")}
-          className="w-full mt-3 border border-slate-300 px-4 py-2 rounded-xl"
-        >
-          Terug
-        </button>
+            {error && (
+              <p className="text-red-600 text-sm mb-2">{error}</p>
+            )}
+
+            <button
+              onClick={login}
+              className="w-full bg-emerald-600 text-white py-2 rounded-xl"
+            >
+              Stuur login-link
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
