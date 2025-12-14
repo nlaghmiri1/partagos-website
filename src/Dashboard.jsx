@@ -1,3 +1,8 @@
+console.log("SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("SUPABASE KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY);
+
+
+
 import React, { useEffect, useMemo, useState } from "react";
 
 /**
