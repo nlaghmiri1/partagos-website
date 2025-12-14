@@ -2,15 +2,12 @@ import { useEffect, useState } from "react";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import PublicSearch from "./PublicSearch";
-
-/* ---------------- SPA navigation helper ---------------- */
+import AdminCustomers from "./AdminCustomers";
 
 function goTo(path) {
   window.history.pushState({}, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
-
-/* ---------------- App ---------------- */
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
@@ -21,13 +18,10 @@ export default function App() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  /* ---------------- routing ---------------- */
-
   if (path === "/login") return <Login />;
   if (path === "/dashboard") return <Dashboard />;
   if (path === "/zoeken") return <PublicSearch />;
-
-  /* ---------------- landing ---------------- */
+  if (path === "/admin/customers") return <AdminCustomers />;
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
@@ -35,8 +29,7 @@ export default function App() {
         <h1 className="text-3xl font-bold mb-3">Partagos</h1>
 
         <p className="text-slate-600 mb-8">
-          AI-gedreven SaaS platform voor auto-onderdelen, magazijnbeheer
-          en multi-tenant verkoop.
+          AI-gedreven SaaS platform voor auto-onderdelen, magazijnbeheer en multi-tenant verkoop.
         </p>
 
         <div className="flex flex-col gap-3">
@@ -51,8 +44,28 @@ export default function App() {
             onClick={() => goTo("/dashboard")}
             className="border border-slate-300 hover:bg-slate-50 px-5 py-3 rounded-xl"
           >
-            Ga naar dashboard (demo)
+            Ga naar dashboard
+          </button>
+
+          <button
+            onClick={() => goTo("/admin/customers")}
+            className="border border-slate-300 hover:bg-slate-50 px-5 py-3 rounded-xl"
+          >
+            Admin: nieuwe klant aanmaken
           </button>
 
           <button
             onClick={() => goTo("/zoeken")}
+            className="text-emerald-700 underline mt-2"
+          >
+            Publiek onderdelen zoeken
+          </button>
+        </div>
+
+        <div className="mt-8 text-xs text-slate-400">
+          © {new Date().getFullYear()} Partagos
+        </div>
+      </div>
+    </div>
+  );
+}
