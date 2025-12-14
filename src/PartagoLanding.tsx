@@ -22,7 +22,7 @@ export default function PartagoLanding() {
             <a href="#contact">Contact</a>
           </nav>
 
-          <a href="/login" style={styles.loginBtn}>
+          <a href="#login" style={styles.loginBtn}>
             Inloggen
           </a>
         </div>
@@ -114,6 +114,37 @@ export default function PartagoLanding() {
           Prijzen van onderdelen zijn openbaar. Platformprijzen zijn uitsluitend
           op aanvraag.
         </p>
+      </section>
+
+      {/* LOGIN (DEMO) */}
+      <section id="login" style={styles.sectionAlt}>
+        <h2>Inloggen (demo)</h2>
+        <p>
+          Dit is een testomgeving. De volledige klantenomgeving wordt momenteel
+          gebouwd.
+        </p>
+
+        <div style={{ marginTop: 20 }}>
+          <a href="#dashboard" style={styles.primaryBtn}>
+            Ga naar demo dashboard
+          </a>
+        </div>
+      </section>
+
+      {/* DASHBOARD PLACEHOLDER */}
+      <section id="dashboard" style={styles.section}>
+        <h2>Demo dashboard</h2>
+        <p>
+          Hier komt de klantenomgeving waar bedrijven producten toevoegen,
+          magazijnen beheren en labels instellen.
+        </p>
+
+        <ul style={{ marginTop: 12 }}>
+          <li>• Productbeheer</li>
+          <li>• Magazijnstructuur</li>
+          <li>• Labelprofielen</li>
+          <li>• Automatische advertenties</li>
+        </ul>
       </section>
 
       {/* CONTACT */}
