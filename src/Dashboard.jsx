@@ -18,40 +18,9 @@ export default function Dashboard() {
     },
   ]);
 
-  const [form, setForm] = useState({
-    name: "",
-    code: "",
-    location: "Magazijn A / Rek 1 / Vak A",
-    price: "",
-    stock: 1,
-  });
-
-  const addProduct = () => {
-    if (!form.name || !form.code) return;
-
-    setProducts([
-      ...products,
-      {
-        ...form,
-        id: Date.now(),
-        price: Number(form.price),
-        stock: Number(form.stock),
-        channels: {
-          partagos: true,
-          marktplaats: false,
-          ebay: false,
-          rrr: false,
-        },
-      },
-    ]);
-
-    setForm({
-      name: "",
-      code: "",
-      location: "Magazijn A / Rek 1 / Vak A",
-      price: "",
-      stock: 1,
-    });
+  const goTo = (path) => {
+    window.history.pushState({}, "", path);
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   return (
@@ -59,69 +28,39 @@ export default function Dashboard() {
       {/* HEADER */}
       <header style={styles.header}>
         <strong>Partagos Dashboard</strong>
-        <span style={styles.user}>Demo account – Admin</span>
+        <div style={styles.headerRight}>
+          <span style={styles.user}>Demo Admin</span>
+          <button onClick={() => goTo("/")} style={styles.linkBtn}>
+            Uitloggen
+          </button>
+        </div>
       </header>
 
       {/* KPI */}
       <section style={styles.kpis}>
         <KPI label="Onderdelen" value={products.length} />
         <KPI label="Magazijnen" value="2" />
-        <KPI label="Actieve advertenties" value={products.filter(p =>
-          Object.values(p.channels).some(v => v)
-        ).length} />
+        <KPI
+          label="Actieve advertenties"
+          value={products.filter((p) =>
+            Object.values(p.channels).some((v) => v)
+          ).length}
+        />
         <KPI label="Kanalen" value="4" />
-      </section>
-
-      {/* PRODUCT TOEVOEGEN */}
-      <section style={styles.section}>
-        <h2>Nieuw onderdeel toevoegen</h2>
-
-        <div style={styles.formGrid}>
-          <input
-            placeholder="Onderdeelnaam"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-          <input
-            placeholder="Onderdeelcode (OEM / bakcode)"
-            value={form.code}
-            onChange={(e) => setForm({ ...form, code: e.target.value })}
-          />
-          <select
-            value={form.location}
-            onChange={(e) => setForm({ ...form, location: e.target.value })}
-          >
-            <option>Magazijn A / Rek 1 / Vak A</option>
-            <option>Magazijn A / Rek 3 / Vak B</option>
-            <option>Magazijn B / Groot</option>
-          </select>
-          <input
-            type="number"
-            placeholder="Prijs €"
-            value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
-          />
-          <input
-            type="number"
-            placeholder="Voorraad"
-            value={form.stock}
-            onChange={(e) => setForm({ ...form, stock: e.target.value })}
-          />
-        </div>
-
-        <button onClick={addProduct} style={styles.primaryBtn}>
-          Onderdeel toevoegen
-        </button>
       </section>
 
       {/* PRODUCTEN */}
       <section style={styles.section}>
         <h2>Centrale onderdelenpool</h2>
+        <p style={styles.muted}>
+          Deze onderdelen zijn zichtbaar voor consumenten en gekoppelde
+          verkoopkanalen.
+        </p>
 
         <table style={styles.table}>
           <thead>
             <tr>
-              <th>Naam</th>
+              <th>Onderdeel</th>
               <th>Code</th>
               <th>Locatie</th>
               <th>Voorraad</th>
@@ -140,26 +79,9 @@ export default function Dashboard() {
                 <td>€{p.price}</td>
                 <td>
                   {Object.entries(p.channels).map(([c, v]) => (
-                    <label key={c} style={styles.channel}>
-                      <input
-                        type="checkbox"
-                        checked={v}
-                        onChange={() =>
-                          setProducts(products.map(prod =>
-                            prod.id === p.id
-                              ? {
-                                  ...prod,
-                                  channels: {
-                                    ...prod.channels,
-                                    [c]: !v,
-                                  },
-                                }
-                              : prod
-                          ))
-                        }
-                      />
-                      {c}
-                    </label>
+                    <div key={c} style={styles.channel}>
+                      {v ? "✓" : "–"} {c}
+                    </div>
                   ))}
                 </td>
                 <td>
@@ -171,14 +93,14 @@ export default function Dashboard() {
         </table>
       </section>
 
-      {/* MAGAZIJN & LABELS */}
+      {/* MAGAZIJN */}
       <section style={styles.sectionAlt}>
         <h2>Magazijn & labels (USP)</h2>
         <ul>
           <li>✔ Vrije magazijnstructuur per klant</li>
-          <li>✔ Labels met eigen velden (klant, marge, status)</li>
-          <li>✔ QR-code per locatie of onderdeel</li>
-          <li>✔ Meerdere labelprofielen per bedrijf</li>
+          <li>✔ Labels met klant-specifieke info</li>
+          <li>✔ QR-codes per onderdeel of locatie</li>
+          <li>✔ Directe koppeling met pick & verzending</li>
         </ul>
       </section>
 
@@ -187,7 +109,7 @@ export default function Dashboard() {
         <h2>Automatische verkoopkanalen</h2>
         <ul>
           <li>✓ Partagos centrale pool</li>
-          <li>✓ Marktplaats 2e hands</li>
+          <li>✓ Marktplaats (2e hands)</li>
           <li>✓ eBay</li>
           <li>✓ RRR.lt</li>
         </ul>
@@ -212,9 +134,14 @@ function KPI({ label, value }) {
 /* ---------- STYLES ---------- */
 
 const styles = {
-  page: { padding: 20, background: "#f8fafc", minHeight: "100vh" },
+  page: {
+    padding: 20,
+    background: "#f8fafc",
+    minHeight: "100vh",
+    fontFamily: "Arial, sans-serif",
+  },
   header: {
-    background: "#fff",
+    background: "#ffffff",
     padding: 16,
     borderRadius: 10,
     display: "flex",
@@ -222,7 +149,22 @@ const styles = {
     marginBottom: 20,
     border: "1px solid #e5e7eb",
   },
-  user: { fontSize: 13, opacity: 0.7 },
+  headerRight: {
+    display: "flex",
+    gap: 12,
+    alignItems: "center",
+  },
+  user: {
+    fontSize: 13,
+    opacity: 0.7,
+  },
+  linkBtn: {
+    background: "none",
+    border: "none",
+    color: "#16a34a",
+    cursor: "pointer",
+    fontWeight: 600,
+  },
   kpis: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
@@ -230,15 +172,22 @@ const styles = {
     marginBottom: 24,
   },
   kpi: {
-    background: "#fff",
+    background: "#ffffff",
     padding: 16,
     borderRadius: 10,
     border: "1px solid #e5e7eb",
   },
-  kpiValue: { fontSize: 24, fontWeight: "bold", color: "#16a34a" },
-  kpiLabel: { fontSize: 13, opacity: 0.7 },
+  kpiValue: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#16a34a",
+  },
+  kpiLabel: {
+    fontSize: 13,
+    opacity: 0.7,
+  },
   section: {
-    background: "#fff",
+    background: "#ffffff",
     padding: 20,
     borderRadius: 12,
     marginBottom: 20,
@@ -251,26 +200,21 @@ const styles = {
     marginBottom: 20,
     border: "1px solid #bbf7d0",
   },
-  formGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: 10,
+  muted: {
+    fontSize: 13,
+    opacity: 0.7,
     marginBottom: 10,
   },
-  primaryBtn: {
-    background: "#16a34a",
-    color: "#fff",
-    padding: "10px 16px",
-    borderRadius: 8,
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 600,
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
   },
-  table: { width: "100%", borderCollapse: "collapse" },
-  channel: { display: "block", fontSize: 12 },
+  channel: {
+    fontSize: 12,
+  },
   smallBtn: {
     background: "#16a34a",
-    color: "#fff",
+    color: "#ffffff",
     border: "none",
     padding: "6px 10px",
     borderRadius: 6,
