@@ -4,14 +4,20 @@ import App from "./App";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 
-const path = window.location.pathname;
+function render() {
+  const path = window.location.pathname;
 
-let Page = App;
-if (path === "/login") Page = Login;
-if (path === "/dashboard") Page = Dashboard;
+  let Page = App;
+  if (path === "/login") Page = Login;
+  if (path === "/dashboard") Page = Dashboard;
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <Page />
-  </React.StrictMode>
-);
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <React.StrictMode>
+      <Page />
+    </React.StrictMode>
+  );
+}
+
+render();
+
+window.addEventListener("popstate", render);
