@@ -1,3 +1,8 @@
+fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/products`)
+  .then(res => console.log("REST STATUS:", res.status))
+  .catch(err => console.error(err));
+
+
 async function addProduct() {
   if (!form.name) {
     alert("Naam ontbreekt");
