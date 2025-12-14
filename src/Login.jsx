@@ -8,17 +8,31 @@ function goTo(path) {
 
 export default function Login() {
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      const user = data?.session?.user;
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("role")
+        .eq("email", user.email)
+        .single();
+
+      if (profile?.role === "admin") {
+        goTo("/admin/customers");
+      } else {
         goTo("/dashboard");
       }
+    }
+
+    checkSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      checkSession();
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        goTo("/dashboard");
-      }
-    });
+    return () => listener.subscription.unsubscribe();
   }, []);
 
   async function sendMagicLink(e) {
@@ -32,7 +46,7 @@ export default function Login() {
       }
     });
 
-    alert("Magic link verstuurd. Check je mail.");
+    alert("Magic link verzonden.");
   }
 
   return (
@@ -46,8 +60,8 @@ export default function Login() {
         <input
           name="email"
           type="email"
-          placeholder="jij@bedrijf.nl"
           required
+          placeholder="jij@bedrijf.nl"
           className="w-full border rounded-xl px-4 py-2 mb-4"
         />
 
