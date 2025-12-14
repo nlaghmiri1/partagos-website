@@ -4,6 +4,7 @@ import App from "./App.jsx";
 import Login from "./Login.jsx";
 import Dashboard from "./Dashboard.jsx";
 import AdminCustomers from "./AdminCustomers.jsx";
+import PublicProduct from "./PublicProduct.jsx";
 import "./index.css";
 
 function Router() {
@@ -15,12 +16,13 @@ function Router() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  // 🔒 ROUTE MATCHING (EXACT)
+  // dynamic public product page: /p/<slug>
+  if (path.startsWith("/p/")) return <PublicProduct />;
+
   if (path === "/login") return <Login />;
   if (path === "/dashboard") return <Dashboard />;
   if (path === "/admin/customers") return <AdminCustomers />;
 
-  // default = landing
   return <App />;
 }
 
