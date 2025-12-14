@@ -1,17 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "./supabaseClient";
 
-/**
- * Partagos Dashboard (Professional)
- * Tabs:
- * 1) Onderdelen (CRUD light: insert + list)
- * 2) Zoeken (VIN / chassis / motor / bak / onderdeelnummer / tekst)
- * 3) Labels (labelprofielen + label preview/print)
- * 4) Rollen (demo user_profiles per tenant)
- *
- * Let op: dit dashboard werkt zonder Supabase Auth (demo). Rollen zijn data-only.
- */
-
 const TABS = [
   { key: "products", label: "Onderdelen" },
   { key: "search", label: "Zoeken" },
@@ -20,6 +9,7 @@ const TABS = [
 ];
 
 const ROLE_OPTIONS = ["admin", "warehouse", "sales", "viewer"];
+
 const LABEL_SIZES = [
   { value: "100x150", label: "100×150 mm (verzendetiket)" },
   { value: "102x76", label: "102×76 mm" },
@@ -42,11 +32,9 @@ export default function Dashboard() {
   const [tab, setTab] = useState("products");
   const [loading, setLoading] = useState(true);
 
-  // Tenancy
   const [companies, setCompanies] = useState([]);
   const [activeCompanyId, setActiveCompanyId] = useState("");
 
-  // Products
   const [products, setProducts] = useState([]);
   const [productForm, setProductForm] = useState({
     name: "",
@@ -60,12 +48,10 @@ export default function Dashboard() {
     chassis: "",
   });
 
-  // Search
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  // Labels
   const [labelProfiles, setLabelProfiles] = useState([]);
   const [activeLabelProfileId, setActiveLabelProfileId] = useState("");
   const [labelForm, setLabelForm] = useState({
@@ -77,7 +63,6 @@ export default function Dashboard() {
   });
   const [labelPreviewProductId, setLabelPreviewProductId] = useState("");
 
-  // Roles
   const [users, setUsers] = useState([]);
   const [userForm, setUserForm] = useState({
     email: "",
@@ -100,13 +85,11 @@ export default function Dashboard() {
     [products, labelPreviewProductId]
   );
 
-  /* ---------------- NAV ---------------- */
   function goTo(path) {
     window.history.pushState({}, "", path);
     window.dispatchEvent(new PopStateEvent("popstate"));
   }
 
-  /* ---------------- BOOT ---------------- */
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -120,12 +103,9 @@ export default function Dashboard() {
     (async () => {
       await Promise.all([loadProducts(activeCompanyId), loadLabelProfiles(activeCompanyId), loadUsers(activeCompanyId)]);
     })();
-    // reset per tenant
     setSearchResults([]);
     setSearchQuery("");
   }, [activeCompanyId]);
-
-  /* ---------------- LOADERS ---------------- */
 
   async function loadCompanies() {
     const { data, error } = await supabase.from("companies").select("*").order("created_at", { ascending: true });
@@ -149,7 +129,6 @@ export default function Dashboard() {
       return;
     }
     setProducts(data || []);
-    // default label preview selection
     if ((data || []).length && !labelPreviewProductId) setLabelPreviewProductId((data || [])[0].id);
   }
 
@@ -161,7 +140,7 @@ export default function Dashboard() {
       .order("created_at", { ascending: true });
 
     if (error) {
-      alert("Fout bij laden labels: " + error.message);
+      alert("Fout bij laden labelprofielen: " + error.message);
       return;
     }
 
@@ -170,7 +149,6 @@ export default function Dashboard() {
 
     if (list.length) {
       setActiveLabelProfileId(list[0].id);
-      // sync form with first profile
       const lp = list[0];
       setLabelForm({
         name: lp.name || "Standaard Label",
@@ -197,8 +175,6 @@ export default function Dashboard() {
     }
     setUsers(data || []);
   }
-
-  /* ---------------- PRODUCTS ---------------- */
 
   async function addProduct() {
     if (!productForm.name || !activeCompanyId) {
@@ -240,17 +216,12 @@ export default function Dashboard() {
     await loadProducts(activeCompanyId);
   }
 
-  /* ---------------- SEARCH ---------------- */
-
   async function runSearch() {
     const q = (searchQuery || "").trim();
     if (!q || !activeCompanyId) return;
 
     setSearchLoading(true);
 
-    // eenvoudige, maar effectieve simulatie:
-    // zoekt in part_number, engine_code, gearbox_code, vin, chassis en name
-    // (Supabase OR via .or())
     const orExpr = [
       `part_number.ilike.%${escapeIlike(q)}%`,
       `engine_code.ilike.%${escapeIlike(q)}%`,
@@ -276,8 +247,6 @@ export default function Dashboard() {
     }
     setSearchResults(data || []);
   }
-
-  /* ---------------- LABELS ---------------- */
 
   function syncLabelFormFromActive() {
     const lp = activeLabelProfile;
@@ -349,17 +318,18 @@ export default function Dashboard() {
   }
 
   function openPrintLabel() {
-    if (!labelPreviewProduct || !labelForm) {
+    if (!labelPreviewProduct) {
       alert("Selecteer een product voor label preview.");
       return;
     }
+
     const html = buildLabelHTML({
       companyName: activeCompany?.name || "Partagos",
       profile: labelForm,
       product: labelPreviewProduct,
     });
 
-    const w = window.open("", "_blank", "noopener,noreferrer,width=720,height=900");
+    const w = window.open("", "_blank", "noopener,noreferrer,width=800,height=900");
     if (!w) {
       alert("Popup geblokkeerd. Sta popups toe om te printen.");
       return;
@@ -368,10 +338,7 @@ export default function Dashboard() {
     w.document.write(html);
     w.document.close();
     w.focus();
-    // automatisch printen (optioneel): w.print();
   }
-
-  /* ---------------- ROLES ---------------- */
 
   async function addUser() {
     if (!activeCompanyId) return;
@@ -407,19 +374,12 @@ export default function Dashboard() {
     await loadUsers(activeCompanyId);
   }
 
-  /* ---------------- UI ---------------- */
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-slate-500">
-        Laden…
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center text-slate-500">Laden…</div>;
   }
 
   return (
     <div className="min-h-screen bg-slate-100 flex">
-      {/* SIDEBAR */}
       <aside className="w-72 bg-slate-900 text-white flex flex-col">
         <div className="px-6 py-5 border-b border-slate-700">
           <div className="text-xl font-extrabold tracking-tight">Partagos</div>
@@ -440,7 +400,7 @@ export default function Dashboard() {
             ))}
           </select>
           <div className="text-xs text-slate-400 mt-2">
-            Tenant-ID: <span className="font-mono">{activeCompanyId.slice(0, 8)}…</span>
+            Tenant-ID: <span className="font-mono">{activeCompanyId ? `${activeCompanyId.slice(0, 8)}…` : "-"}</span>
           </div>
         </div>
 
@@ -467,68 +427,50 @@ export default function Dashboard() {
           >
             Uitloggen
           </button>
-          <div className="text-[11px] text-slate-400 mt-3">
-            Demo zonder Auth. Rollen zijn data-only.
-          </div>
+          <div className="text-[11px] text-slate-400 mt-3">Demo zonder Auth. Rollen zijn data-only.</div>
         </div>
       </aside>
 
-      {/* MAIN */}
       <main className="flex-1">
-        {/* TOPBAR */}
         <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
           <div>
-            <div className="text-lg font-semibold text-slate-900">
-              {tabLabel(tab)}
-            </div>
-            <div className="text-sm text-slate-500">
-              {tabSubtitle(tab)}
-            </div>
+            <div className="text-lg font-semibold text-slate-900">{tabLabel(tab)}</div>
+            <div className="text-sm text-slate-500">{tabSubtitle(tab)}</div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="hidden md:block text-sm text-slate-600">
-              {activeCompany ? (
-                <>
-                  <span className="font-medium">{activeCompany.name}</span>
-                </>
-              ) : null}
-            </div>
-            <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Supabase live
-            </span>
-          </div>
+          <span className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            Supabase live
+          </span>
         </header>
 
         <div className="p-6 space-y-6">
-          {/* KPI ROW */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <KPI title="Onderdelen" value={String(products.length)} sub="Actieve items in tenant" />
             <KPI title="Zoekresultaten" value={String(searchResults.length)} sub="Laatste zoekopdracht" />
             <KPI title="Labelprofielen" value={String(labelProfiles.length)} sub="Per bedrijf instelbaar" />
           </div>
 
-          {/* TAB CONTENT */}
           {tab === "products" && (
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
                 <div className="font-semibold text-slate-900">Nieuw onderdeel</div>
-                <div className="text-sm text-slate-500 mt-1">
-                  Voeg voorraad toe aan {activeCompany?.name || "bedrijf"}.
-                </div>
+                <div className="text-sm text-slate-500 mt-1">Voeg voorraad toe aan {activeCompany?.name || "bedrijf"}.</div>
 
                 <div className="mt-4 grid grid-cols-1 gap-3">
                   <Input label="Naam *" value={productForm.name} onChange={(v) => setProductForm({ ...productForm, name: v })} />
                   <Input label="Onderdeelnummer" value={productForm.part_number} onChange={(v) => setProductForm({ ...productForm, part_number: v })} />
+
                   <div className="grid grid-cols-2 gap-3">
                     <Input label="Motorcode" value={productForm.engine_code} onChange={(v) => setProductForm({ ...productForm, engine_code: v })} />
                     <Input label="Bakcode" value={productForm.gearbox_code} onChange={(v) => setProductForm({ ...productForm, gearbox_code: v })} />
                   </div>
+
                   <Input label="Locatie" value={productForm.location} onChange={(v) => setProductForm({ ...productForm, location: v })} />
+
                   <div className="grid grid-cols-2 gap-3">
                     <Input label="VIN" value={productForm.vin} onChange={(v) => setProductForm({ ...productForm, vin: v })} />
                     <Input label="Chassis" value={productForm.chassis} onChange={(v) => setProductForm({ ...productForm, chassis: v })} />
                   </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <Input label="Prijs (€)" type="number" value={productForm.price} onChange={(v) => setProductForm({ ...productForm, price: v })} />
                     <Input label="Voorraad" type="number" value={String(productForm.stock)} onChange={(v) => setProductForm({ ...productForm, stock: Number(v) })} />
@@ -604,7 +546,7 @@ export default function Dashboard() {
             <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                 <div>
-                  <div className="font-semibold text-slate-900">Zoeken (VIN / motor / bak / nr)</div>
+                  <div className="font-semibold text-slate-900">Zoeken (VIN / chassis / motor / bak / nr)</div>
                   <div className="text-sm text-slate-500">
                     Simulatie op basis van jouw productdata in Supabase (tenant-gebonden).
                   </div>
@@ -671,7 +613,6 @@ export default function Dashboard() {
 
           {tab === "labels" && (
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Profiles */}
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
                 <div className="flex items-center justify-between">
                   <div>
@@ -694,43 +635,31 @@ export default function Dashboard() {
                       key={lp.id}
                       onClick={() => {
                         setActiveLabelProfileId(lp.id);
-                        // sync form to selected
-                        const sel = lp;
                         setLabelForm({
-                          name: sel.name || "Standaard Label",
-                          size: sel.size || "100x150",
-                          header_text: sel.header_text || "",
-                          footer_text: sel.footer_text || "",
-                          fields: Array.isArray(sel.fields) ? sel.fields : (sel.fields || []),
+                          name: lp.name || "Standaard Label",
+                          size: lp.size || "100x150",
+                          header_text: lp.header_text || "",
+                          footer_text: lp.footer_text || "",
+                          fields: Array.isArray(lp.fields) ? lp.fields : (lp.fields || []),
                         });
                       }}
                       className={`w-full text-left px-4 py-3 rounded-xl border ${
-                        lp.id === activeLabelProfileId
-                          ? "border-emerald-300 bg-emerald-50"
-                          : "border-slate-200 hover:bg-slate-50"
+                        lp.id === activeLabelProfileId ? "border-emerald-300 bg-emerald-50" : "border-slate-200 hover:bg-slate-50"
                       }`}
                     >
                       <div className="font-medium text-slate-900">{lp.name}</div>
                       <div className="text-xs text-slate-500">Size: {lp.size}</div>
                     </button>
                   ))}
-
-                  {labelProfiles.length === 0 && (
-                    <div className="text-sm text-slate-500 mt-3">
-                      Nog geen labelprofielen. Klik op “Nieuw”.
-                    </div>
-                  )}
+                  {labelProfiles.length === 0 && <div className="text-sm text-slate-500 mt-3">Nog geen labelprofielen.</div>}
                 </div>
               </div>
 
-              {/* Editor */}
               <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="font-semibold text-slate-900">Label editor</div>
-                    <div className="text-sm text-slate-500">
-                      Kies welke informatie op de sticker komt (USP).
-                    </div>
+                    <div className="text-sm text-slate-500">Kies welke informatie op de sticker komt (USP).</div>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -752,12 +681,7 @@ export default function Dashboard() {
 
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input label="Profielnaam" value={labelForm.name} onChange={(v) => setLabelForm({ ...labelForm, name: v })} />
-                  <Select
-                    label="Stickerformaat"
-                    value={labelForm.size}
-                    onChange={(v) => setLabelForm({ ...labelForm, size: v })}
-                    options={LABEL_SIZES}
-                  />
+                  <Select label="Stickerformaat" value={labelForm.size} onChange={(v) => setLabelForm({ ...labelForm, size: v })} options={LABEL_SIZES} />
                   <Input label="Header" value={labelForm.header_text} onChange={(v) => setLabelForm({ ...labelForm, header_text: v })} />
                   <Input label="Footer" value={labelForm.footer_text} onChange={(v) => setLabelForm({ ...labelForm, footer_text: v })} />
                 </div>
@@ -776,11 +700,7 @@ export default function Dashboard() {
                             checked ? "border-emerald-300 bg-emerald-50" : "border-slate-200 hover:bg-slate-50"
                           }`}
                         >
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => toggleLabelField(f.key)}
-                          />
+                          <input type="checkbox" checked={checked} onChange={() => toggleLabelField(f.key)} />
                           <span className="text-sm">{f.label}</span>
                         </label>
                       );
@@ -793,12 +713,7 @@ export default function Dashboard() {
                     label="Preview product"
                     value={labelPreviewProductId}
                     onChange={(v) => setLabelPreviewProductId(v)}
-                    options={[
-                      ...(products || []).map((p) => ({
-                        value: p.id,
-                        label: `${p.name}${p.part_number ? ` • ${p.part_number}` : ""}`,
-                      })),
-                    ]}
+                    options={(products || []).map((p) => ({ value: p.id, label: `${p.name}${p.part_number ? ` • ${p.part_number}` : ""}` }))}
                   />
 
                   <div className="md:col-span-2">
@@ -812,31 +727,16 @@ export default function Dashboard() {
                       >
                         Open print view (PDF)
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!labelPreviewProduct) return;
-                          alert("Tip: voeg later QR-code + barcode toe. (Volgende iteratie)");
-                        }}
-                        className="border border-slate-200 hover:bg-slate-50 rounded-xl px-4 py-2 text-sm"
-                      >
-                        QR/Barcode (next)
-                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Inline label preview card */}
                 <div className="mt-6 border border-slate-200 rounded-2xl p-4 bg-slate-50">
                   <div className="text-sm font-medium text-slate-900 mb-2">Inline preview</div>
                   {!labelPreviewProduct ? (
                     <div className="text-sm text-slate-500">Geen product geselecteerd.</div>
                   ) : (
-                    <LabelCard
-                      companyName={activeCompany?.name || "Partagos"}
-                      profile={labelForm}
-                      product={labelPreviewProduct}
-                    />
+                    <LabelCard companyName={activeCompany?.name || "Partagos"} profile={labelForm} product={labelPreviewProduct} />
                   )}
                 </div>
               </div>
@@ -847,19 +747,12 @@ export default function Dashboard() {
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
                 <div className="font-semibold text-slate-900">Nieuwe gebruiker</div>
-                <div className="text-sm text-slate-500 mt-1">
-                  Demo user_profiles (zonder auth). Later koppelen we dit aan Supabase Auth.
-                </div>
+                <div className="text-sm text-slate-500 mt-1">Demo user_profiles (zonder auth).</div>
 
                 <div className="mt-4 space-y-3">
                   <Input label="E-mail *" value={userForm.email} onChange={(v) => setUserForm({ ...userForm, email: v })} />
                   <Input label="Naam" value={userForm.full_name} onChange={(v) => setUserForm({ ...userForm, full_name: v })} />
-                  <Select
-                    label="Rol"
-                    value={userForm.role}
-                    onChange={(v) => setUserForm({ ...userForm, role: v })}
-                    options={ROLE_OPTIONS.map((r) => ({ value: r, label: r }))}
-                  />
+                  <Select label="Rol" value={userForm.role} onChange={(v) => setUserForm({ ...userForm, role: v })} options={ROLE_OPTIONS.map((r) => ({ value: r, label: r }))} />
 
                   <button
                     type="button"
@@ -893,7 +786,6 @@ export default function Dashboard() {
                         <th className="py-2 pr-4">E-mail</th>
                         <th className="py-2 pr-4">Naam</th>
                         <th className="py-2 pr-4">Rol</th>
-                        <th className="py-2 pr-4">Actie</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -914,16 +806,11 @@ export default function Dashboard() {
                               ))}
                             </select>
                           </td>
-                          <td className="py-2 pr-4">
-                            <span className="text-xs px-2 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700">
-                              tenant
-                            </span>
-                          </td>
                         </tr>
                       ))}
                       {users.length === 0 && (
                         <tr>
-                          <td colSpan={4} className="py-6 text-center text-slate-500">
+                          <td colSpan={3} className="py-6 text-center text-slate-500">
                             Nog geen gebruikers voor dit bedrijf.
                           </td>
                         </tr>
@@ -933,7 +820,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="mt-4 text-xs text-slate-500">
-                  Volgende iteratie: Supabase Auth (e-mail login) + RLS per company_id.
+                  Volgende iteratie: Supabase Auth + RLS per company_id.
                 </div>
               </div>
             </section>
@@ -944,7 +831,7 @@ export default function Dashboard() {
   );
 }
 
-/* ---------------- COMPONENTS ---------------- */
+/* --------- UI bits --------- */
 
 function KPI({ title, value, sub }) {
   return (
@@ -1012,7 +899,7 @@ function LabelCard({ companyName, profile, product }) {
   );
 }
 
-/* ---------------- HELPERS ---------------- */
+/* --------- helpers --------- */
 
 function tabLabel(tab) {
   return (
@@ -1037,7 +924,18 @@ function tabSubtitle(tab) {
 }
 
 function fieldLabel(key) {
-  return FIELD_OPTIONS.find((f) => f.key === key)?.label || key;
+  const map = {
+    name: "Naam",
+    part_number: "Onderdeelnummer",
+    engine_code: "Motorcode",
+    gearbox_code: "Bakcode",
+    location: "Locatie",
+    price: "Prijs",
+    stock: "Voorraad",
+    vin: "VIN",
+    chassis: "Chassis",
+  };
+  return map[key] || key;
 }
 
 function formatField(p, key) {
@@ -1048,16 +946,12 @@ function formatField(p, key) {
 }
 
 function escapeIlike(input) {
-  // Supabase ilike: escapet % en _
   return input.replaceAll("%", "\\%").replaceAll("_", "\\_");
 }
 
 function buildLabelHTML({ companyName, profile, product }) {
   const size = profile.size || "100x150";
   const fields = Array.isArray(profile.fields) ? profile.fields : [];
-
-  // size mm → px for print (approx @ 96dpi: 1in=25.4mm, 96px/in)
-  // we use CSS mm for print accuracy instead of px
   const [wMm, hMm] = size.split("x").map((n) => Number(n) || 100);
 
   const rows = fields
