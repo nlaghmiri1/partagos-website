@@ -1,6 +1,11 @@
 import React from "react";
 
 export default function App() {
+  const goTo = (path) => {
+    window.history.pushState({}, "", path);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+
   return (
     <div style={styles.page}>
       {/* HEADER */}
@@ -10,21 +15,20 @@ export default function App() {
             <div style={styles.logo} />
             <div>
               <strong>Partagos</strong>
-              <div style={styles.tag}>AI Parts Platform</div>
+              <div style={styles.tag}>AI-gedreven auto-onderdelenplatform</div>
             </div>
           </div>
 
           <nav style={styles.nav}>
             <a href="#features">Features</a>
-            <a href="#search">Zoeken</a>
             <a href="#vendors">Vendors</a>
             <a href="#pricing">Pricing</a>
             <a href="#contact">Contact</a>
           </nav>
 
-          <a href="/login" style={styles.loginBtn}>
+          <button onClick={() => goTo("/login")} style={styles.loginBtn}>
             Inloggen
-          </a>
+          </button>
         </div>
       </header>
 
@@ -33,29 +37,34 @@ export default function App() {
         <div style={styles.heroInner}>
           <div>
             <h1 style={styles.h1}>
-              Eén platform voor <span style={styles.green}>auto-onderdelenbeheer</span> én{" "}
+              Eén platform voor{" "}
+              <span style={styles.green}>auto-onderdelenbeheer</span> én{" "}
               <span style={styles.green}>verkoop</span>
             </h1>
+
             <p style={styles.lead}>
-              Partagos combineert flexibel magazijnbeheer met een centrale zoekpool
-              waarin de voorraad van aangesloten bedrijven samenkomt.
-              Consumentenprijzen zijn openbaar.
+              Partagos combineert flexibel magazijnbeheer met een centrale
+              zoekpool waarin onderdelen van meerdere bedrijven samenkomen.
+              Consumentenprijzen zijn zichtbaar.
             </p>
 
             <div style={styles.ctaRow}>
               <a href="mailto:demo@partagos.nl" style={styles.primaryBtn}>
                 Demo aanvragen
               </a>
-              <a href="#features" style={styles.secondaryBtn}>
-                Bekijk features
-              </a>
+              <button
+                onClick={() => goTo("/login")}
+                style={styles.secondaryBtn}
+              >
+                Naar login
+              </button>
             </div>
           </div>
 
           {/* SEARCH MOCK */}
           <div style={styles.card}>
             <div style={styles.cardHeader}>Demo zoeken</div>
-            <div style={styles.cardBody} id="search">
+            <div style={styles.cardBody}>
               <input
                 style={styles.input}
                 placeholder="Zoek op kenteken, VIN, motorcode, bakcode…"
@@ -81,13 +90,13 @@ export default function App() {
         <div style={styles.features}>
           {[
             "Centrale onderdelenpool",
-            "Magazijn & labels",
-            "QR-codes",
-            "AI ondersteuning",
+            "Magazijnbeheer & labels",
+            "QR-codes per onderdeel",
+            "Automatische advertenties",
             "Export & verzending",
             "Rollen & rechten",
-            "Offertes & facturen",
-            "Schaalbaar SaaS",
+            "Offertes & B2B",
+            "Schaalbaar SaaS-platform",
           ].map((f) => (
             <div key={f} style={styles.featureCard}>
               {f}
@@ -98,10 +107,10 @@ export default function App() {
 
       {/* VENDORS */}
       <section id="vendors" style={styles.sectionAlt}>
-        <h2>Vendor portal</h2>
+        <h2>Voor sloperijen & onderdelenhandel</h2>
         <p>
-          Leveranciers beheren hun eigen voorraad die automatisch verschijnt in
-          de centrale pool.
+          Elk aangesloten bedrijf beheert zijn eigen voorraad, terwijl de
+          onderdelen automatisch zichtbaar worden in de centrale zoekpool.
         </p>
       </section>
 
@@ -109,7 +118,8 @@ export default function App() {
       <section id="pricing" style={styles.section}>
         <h2>Abonnementen</h2>
         <p>
-          Onderdeelprijzen zijn openbaar. Platformprijzen zijn op aanvraag.
+          Prijzen van onderdelen zijn openbaar. Platformprijzen zijn uitsluitend
+          op aanvraag.
         </p>
       </section>
 
@@ -130,21 +140,25 @@ export default function App() {
 
       {/* FOOTER */}
       <footer style={styles.footer}>
-        © {new Date().getFullYear()} Partagos.nl — AI-gedreven auto-onderdelenplatform
+        © {new Date().getFullYear()} Partagos.nl — AI-gedreven
+        auto-onderdelenplatform
       </footer>
     </div>
   );
 }
 
+/* ---------- STYLES ---------- */
+
 const styles = {
   page: {
     fontFamily: "Arial, sans-serif",
     color: "#0b0f14",
+    background: "#ffffff",
   },
   header: {
     position: "sticky",
     top: 0,
-    background: "#fff",
+    background: "#ffffff",
     borderBottom: "1px solid #e5e7eb",
     zIndex: 10,
   },
@@ -165,16 +179,14 @@ const styles = {
     background: "#16a34a",
   },
   tag: { fontSize: 11, opacity: 0.6 },
-  nav: {
-    display: "flex",
-    gap: 14,
-  },
+  nav: { display: "flex", gap: 14 },
   loginBtn: {
     background: "#16a34a",
-    color: "#fff",
+    color: "#ffffff",
     padding: "8px 14px",
     borderRadius: 8,
-    textDecoration: "none",
+    border: "none",
+    cursor: "pointer",
     fontWeight: 600,
   },
   hero: {
@@ -194,23 +206,25 @@ const styles = {
   ctaRow: { display: "flex", gap: 12, marginTop: 16 },
   primaryBtn: {
     background: "#16a34a",
-    color: "#fff",
+    color: "#ffffff",
     padding: "10px 18px",
     borderRadius: 8,
     textDecoration: "none",
+    border: "none",
     fontWeight: 600,
+    cursor: "pointer",
   },
   secondaryBtn: {
     border: "1px solid #d1d5db",
     padding: "10px 18px",
     borderRadius: 8,
-    textDecoration: "none",
-    color: "#0b0f14",
+    background: "#ffffff",
+    cursor: "pointer",
   },
   card: {
     border: "1px solid #e5e7eb",
     borderRadius: 12,
-    background: "#fff",
+    background: "#ffffff",
   },
   cardHeader: {
     padding: 12,
@@ -225,7 +239,7 @@ const styles = {
   },
   searchBtn: {
     background: "#16a34a",
-    color: "#fff",
+    color: "#ffffff",
     padding: "8px 14px",
     borderRadius: 6,
     border: "none",
@@ -257,7 +271,7 @@ const styles = {
     border: "1px solid #e5e7eb",
     padding: 16,
     borderRadius: 10,
-    background: "#fff",
+    background: "#ffffff",
   },
   footer: {
     borderTop: "1px solid #e5e7eb",
