@@ -1,27 +1,67 @@
 import React from "react";
 
 export default function Login() {
+  const goToDashboard = () => {
+    window.history.pushState({}, "", "/dashboard");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center">
-      <div className="w-full max-w-md rounded-2xl border border-neutral-800 bg-neutral-900 p-6">
-        <h1 className="text-2xl font-bold">Inloggen bij Partagos</h1>
-        <p className="mt-2 text-neutral-400 text-sm">
-          Testomgeving – backend is nog in ontwikkeling
+    <div style={styles.page}>
+      <div style={styles.card}>
+        <h1>Inloggen bij Partagos</h1>
+
+        <p style={styles.text}>
+          Testomgeving – backend is nog in ontwikkeling.
         </p>
 
-        <div className="mt-6 space-y-3">
-          <button
-            onClick={() => (window.location.href = "/dashboard")}
-            className="w-full py-3 rounded-xl bg-emerald-500 text-black font-semibold"
-          >
-            Ga naar demo-omgeving
-          </button>
+        <button onClick={goToDashboard} style={styles.primaryBtn}>
+          Ga naar demo-omgeving
+        </button>
 
-          <div className="text-xs text-neutral-500 text-center">
-            Je logt in als <b>Partagos Demo (Admin)</b>
-          </div>
-        </div>
+        <p style={styles.note}>
+          Je logt in als <strong>Partagos Demo (Admin)</strong>
+        </p>
       </div>
     </div>
   );
 }
+
+const styles = {
+  page: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "#f8fafc",
+    fontFamily: "Arial, sans-serif",
+  },
+  card: {
+    background: "#ffffff",
+    padding: 30,
+    borderRadius: 12,
+    border: "1px solid #e5e7eb",
+    maxWidth: 420,
+    width: "100%",
+    textAlign: "center",
+  },
+  text: {
+    margin: "12px 0 20px",
+    opacity: 0.8,
+  },
+  primaryBtn: {
+    background: "#16a34a",
+    color: "#ffffff",
+    padding: "12px 18px",
+    borderRadius: 8,
+    border: "none",
+    cursor: "pointer",
+    fontWeight: 600,
+    width: "100%",
+  },
+  note: {
+    marginTop: 16,
+    fontSize: 13,
+    opacity: 0.7,
+  },
+};
