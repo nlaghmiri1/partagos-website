@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "./supabaseClient";
 import { useRole } from "./useRole";
+import { featuresForPackage } from "./permissions";
 
 /* ---------------- helpers ---------------- */
 
@@ -18,15 +19,18 @@ function escapeIlike(s) {
 export default function Dashboard() {
   const { role, loading: roleLoading } = useRole();
 
-  const [tab, setTab] = useState("products");
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState("products");
 
   const [companies, setCompanies] = useState([]);
-  const [activeCompanyId, setActiveCompanyId] = useState("");
+  const [activeCompany, setActiveCompany] = useState(null);
 
   const [products, setProducts] = useState([]);
   const [searchQ, setSearchQ] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState({ email: "", role: "viewer" });
 
   const [productForm, setProductForm] = useState({
     name: "",
@@ -38,15 +42,6 @@ export default function Dashboard() {
     stock: 1,
   });
 
-  const [labelProfiles, setLabelProfiles] = useState([]);
-  const [activeLabel, setActiveLabel] = useState(null);
-
-  const [users, setUsers] = useState([]);
-  const [newUser, setNewUser] = useState({
-    email: "",
-    role: "viewer",
-  });
-
   /* ---------------- auth guard ---------------- */
 
   useEffect(() => {
@@ -55,50 +50,52 @@ export default function Dashboard() {
     });
   }, []);
 
-  /* ---------------- load data ---------------- */
+  /* ---------------- load companies ---------------- */
 
   useEffect(() => {
     loadCompanies();
   }, []);
 
-  useEffect(() => {
-    if (activeCompanyId) {
-      loadProducts();
-      loadLabels();
-      loadUsers();
-    }
-  }, [activeCompanyId]);
-
   async function loadCompanies() {
     const { data } = await supabase.from("companies").select("*");
-    setCompanies(data || []);
-    if (data?.length) setActiveCompanyId(data[0].id);
+    if (data?.length) {
+      setCompanies(data);
+      setActiveCompany(data[0]);
+    }
     setLoading(false);
   }
+
+  /* ---------------- derived: features ---------------- */
+
+  const features = useMemo(
+    () => featuresForPackage(activeCompany?.package),
+    [activeCompany]
+  );
+
+  /* ---------------- load data per company ---------------- */
+
+  useEffect(() => {
+    if (!activeCompany) return;
+    loadProducts();
+    if (features.canUseMultiUsers && role === "admin") {
+      loadUsers();
+    }
+  }, [activeCompany, features, role]);
 
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
       .select("*")
-      .eq("company_id", activeCompanyId)
+      .eq("company_id", activeCompany.id)
       .order("created_at", { ascending: false });
     setProducts(data || []);
-  }
-
-  async function loadLabels() {
-    const { data } = await supabase
-      .from("label_profiles")
-      .select("*")
-      .eq("company_id", activeCompanyId);
-    setLabelProfiles(data || []);
-    if (data?.length) setActiveLabel(data[0]);
   }
 
   async function loadUsers() {
     const { data } = await supabase
       .from("user_profiles")
       .select("*")
-      .eq("company_id", activeCompanyId);
+      .eq("company_id", activeCompany.id);
     setUsers(data || []);
   }
 
@@ -109,10 +106,10 @@ export default function Dashboard() {
 
     await supabase.from("products").insert([
       {
-        company_id: activeCompanyId,
+        company_id: activeCompany.id,
         ...productForm,
         price: productForm.price ? Number(productForm.price) : null,
-        stock: Number(productForm.stock),
+        stock: Number(productForm.stock) || 1,
       },
     ]);
 
@@ -136,7 +133,7 @@ export default function Dashboard() {
     const { data } = await supabase
       .from("products")
       .select("*")
-      .eq("company_id", activeCompanyId)
+      .eq("company_id", activeCompany.id)
       .or(
         `name.ilike.%${q}%,part_number.ilike.%${q}%,engine_code.ilike.%${q}%,gearbox_code.ilike.%${q}%`
       );
@@ -146,11 +143,15 @@ export default function Dashboard() {
 
   async function addUser() {
     if (!newUser.email) return;
+    if (users.length >= features.maxUsers) {
+      alert("Maximaal aantal gebruikers bereikt voor dit pakket.");
+      return;
+    }
 
     await supabase.from("user_profiles").insert([
       {
-        company_id: activeCompanyId,
-        email: newUser.email,
+        company_id: activeCompany.id,
+        email: newUser.email.trim().toLowerCase(),
         role: newUser.role,
       },
     ]);
@@ -164,15 +165,21 @@ export default function Dashboard() {
     goTo("/login");
   }
 
-  /* ---------------- render ---------------- */
+  /* ---------------- render guards ---------------- */
 
   if (loading || roleLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Laden…</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Laden…
+      </div>
+    );
   }
 
   if (!role) {
     return <div className="p-6">Geen toegang</div>;
   }
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="min-h-screen flex bg-slate-100">
@@ -183,28 +190,23 @@ export default function Dashboard() {
         </div>
 
         <nav className="flex-1 p-3 space-y-1 text-sm">
-          {[
-            ["products", "Onderdelen"],
-            ["search", "Zoeken"],
-            ["labels", "Labels"],
-            ["roles", "Rollen"],
-          ].map(([k, l]) => (
-            <button
-              key={k}
-              onClick={() => setTab(k)}
-              className={`w-full text-left px-4 py-2 rounded-lg ${
-                tab === k ? "bg-emerald-600" : "hover:bg-slate-800"
-              }`}
-            >
-              {l}
-            </button>
-          ))}
+          <NavBtn label="Onderdelen" active={tab === "products"} onClick={() => setTab("products")} />
+          <NavBtn label="Zoeken" active={tab === "search"} onClick={() => setTab("search")} />
+
+          {features.canUseLabels && (
+            <NavBtn label="Labels" active={tab === "labels"} onClick={() => setTab("labels")} />
+          )}
+
+          {features.canUseMultiUsers && role === "admin" && (
+            <NavBtn label="Gebruikers" active={tab === "users"} onClick={() => setTab("users")} />
+          )}
         </nav>
 
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-4 border-t border-slate-700 text-xs">
+          <div>Pakket: <b>{activeCompany.package}</b></div>
           <button
             onClick={logout}
-            className="w-full text-sm bg-slate-800 px-3 py-2 rounded-lg"
+            className="mt-3 w-full bg-slate-800 px-3 py-2 rounded-lg"
           >
             Uitloggen
           </button>
@@ -217,13 +219,17 @@ export default function Dashboard() {
           <h1 className="font-semibold capitalize">{tab}</h1>
 
           <select
-            value={activeCompanyId}
-            onChange={(e) => setActiveCompanyId(e.target.value)}
+            value={activeCompany.id}
+            onChange={(e) =>
+              setActiveCompany(
+                companies.find((c) => c.id === e.target.value)
+              )
+            }
             className="border rounded-lg px-3 py-2 text-sm"
           >
             {companies.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {c.name} ({c.package})
               </option>
             ))}
           </select>
@@ -233,9 +239,7 @@ export default function Dashboard() {
           {/* PRODUCTS */}
           {tab === "products" && (
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="bg-white p-5 rounded-xl border">
-                <h2 className="font-semibold mb-3">Nieuw onderdeel</h2>
-
+              <Card title="Nieuw onderdeel">
                 {Object.entries(productForm).map(([k, v]) => (
                   <input
                     key={k}
@@ -248,49 +252,33 @@ export default function Dashboard() {
                     className="w-full mb-2 border rounded-lg px-3 py-2"
                   />
                 ))}
-
                 <button
                   onClick={addProduct}
                   className="mt-2 bg-emerald-600 text-white w-full py-2 rounded-lg"
                 >
                   Opslaan
                 </button>
-              </div>
+              </Card>
 
-              <div className="lg:col-span-2 bg-white p-5 rounded-xl border">
-                <h2 className="font-semibold mb-3">Onderdelen</h2>
-
-                <table className="w-full text-sm">
-                  <thead className="border-b text-left">
-                    <tr>
-                      <th>Naam</th>
-                      <th>Nr</th>
-                      <th>Motor</th>
-                      <th>Bak</th>
-                      <th>Prijs</th>
-                      <th>Voorraad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((p) => (
-                      <tr key={p.id} className="border-b">
-                        <td>{p.name}</td>
-                        <td>{p.part_number}</td>
-                        <td>{p.engine_code}</td>
-                        <td>{p.gearbox_code}</td>
-                        <td>{p.price ? `€${p.price}` : "-"}</td>
-                        <td>{p.stock}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <Card title="Onderdelen" className="lg:col-span-2">
+                <Table
+                  headers={["Naam", "Nr", "Motor", "Bak", "Prijs", "Voorraad"]}
+                  rows={products.map((p) => [
+                    p.name,
+                    p.part_number,
+                    p.engine_code,
+                    p.gearbox_code,
+                    p.price ? `€${p.price}` : "-",
+                    p.stock,
+                  ])}
+                />
+              </Card>
             </section>
           )}
 
           {/* SEARCH */}
           {tab === "search" && (
-            <section className="bg-white p-5 rounded-xl border">
+            <Card title="Zoeken">
               <div className="flex gap-2 mb-4">
                 <input
                   className="flex-1 border rounded-lg px-4 py-2"
@@ -306,54 +294,31 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              <table className="w-full text-sm">
-                <thead className="border-b text-left">
-                  <tr>
-                    <th>Naam</th>
-                    <th>Nr</th>
-                    <th>Motor</th>
-                    <th>Bak</th>
-                    <th>Prijs</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchResults.map((p) => (
-                    <tr key={p.id} className="border-b">
-                      <td>{p.name}</td>
-                      <td>{p.part_number}</td>
-                      <td>{p.engine_code}</td>
-                      <td>{p.gearbox_code}</td>
-                      <td>{p.price ? `€${p.price}` : "-"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
+              <Table
+                headers={["Naam", "Nr", "Motor", "Bak", "Prijs"]}
+                rows={searchResults.map((p) => [
+                  p.name,
+                  p.part_number,
+                  p.engine_code,
+                  p.gearbox_code,
+                  p.price ? `€${p.price}` : "-",
+                ])}
+              />
+            </Card>
           )}
 
           {/* LABELS */}
-          {tab === "labels" && (
-            <section className="bg-white p-5 rounded-xl border">
-              <h2 className="font-semibold mb-3">Labelprofielen</h2>
-              {labelProfiles.map((l) => (
-                <div
-                  key={l.id}
-                  className="border rounded-lg p-3 mb-2"
-                >
-                  <div className="font-medium">{l.name}</div>
-                  <div className="text-sm text-slate-500">
-                    Formaat: {l.size}
-                  </div>
-                </div>
-              ))}
-            </section>
+          {tab === "labels" && features.canUseLabels && (
+            <Card title="Labels">
+              <p className="text-sm text-slate-500">
+                Label designer & PDF export (volgende stap).
+              </p>
+            </Card>
           )}
 
-          {/* ROLES */}
-          {tab === "roles" && role === "admin" && (
-            <section className="bg-white p-5 rounded-xl border">
-              <h2 className="font-semibold mb-3">Gebruikers</h2>
-
+          {/* USERS */}
+          {tab === "users" && features.canUseMultiUsers && role === "admin" && (
+            <Card title={`Gebruikers (${users.length}/${features.maxUsers})`}>
               <div className="flex gap-2 mb-4">
                 <input
                   className="border rounded-lg px-3 py-2"
@@ -382,26 +347,61 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              <table className="w-full text-sm">
-                <thead className="border-b text-left">
-                  <tr>
-                    <th>Email</th>
-                    <th>Rol</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u) => (
-                    <tr key={u.id} className="border-b">
-                      <td>{u.email}</td>
-                      <td>{u.role}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
+              <Table
+                headers={["Email", "Rol"]}
+                rows={users.map((u) => [u.email, u.role])}
+              />
+            </Card>
           )}
         </div>
       </main>
     </div>
+  );
+}
+
+/* ---------------- UI helpers ---------------- */
+
+function NavBtn({ label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full text-left px-4 py-2 rounded-lg ${
+        active ? "bg-emerald-600" : "hover:bg-slate-800"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function Card({ title, children, className = "" }) {
+  return (
+    <div className={`bg-white p-5 rounded-xl border ${className}`}>
+      <h2 className="font-semibold mb-3">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function Table({ headers, rows }) {
+  return (
+    <table className="w-full text-sm">
+      <thead className="border-b text-left">
+        <tr>
+          {headers.map((h) => (
+            <th key={h}>{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => (
+          <tr key={i} className="border-b">
+            {r.map((c, j) => (
+              <td key={j}>{c}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
