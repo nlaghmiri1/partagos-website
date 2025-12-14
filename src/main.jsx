@@ -6,13 +6,6 @@ import Dashboard from "./Dashboard.jsx";
 import AdminCustomers from "./AdminCustomers.jsx";
 import "./index.css";
 
-function matchRoute(pathname) {
-  if (pathname === "/login") return "login";
-  if (pathname === "/dashboard") return "dashboard";
-  if (pathname === "/admin/customers") return "admin-customers";
-  return "home";
-}
-
 function Router() {
   const [path, setPath] = React.useState(window.location.pathname);
 
@@ -22,11 +15,12 @@ function Router() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  const route = matchRoute(path);
+  // 🔒 ROUTE MATCHING (EXACT)
+  if (path === "/login") return <Login />;
+  if (path === "/dashboard") return <Dashboard />;
+  if (path === "/admin/customers") return <AdminCustomers />;
 
-  if (route === "login") return <Login />;
-  if (route === "dashboard") return <Dashboard />;
-  if (route === "admin-customers") return <AdminCustomers />;
+  // default = landing
   return <App />;
 }
 
