@@ -1,116 +1,71 @@
 import React from "react";
-import {
-  Search,
-  Boxes,
-  Cpu,
-  QrCode,
-  Truck,
-  Globe2,
-  ShieldCheck,
-  Receipt,
-  Rocket,
-  MessageSquare,
-  Store,
-  Upload,
-  Settings,
-  PackageSearch,
-  Database,
-  ChevronRight,
-} from "lucide-react";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+    <div style={styles.page}>
       {/* HEADER */}
-      <header className="sticky top-0 z-20 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500" />
-            <span className="font-semibold tracking-tight">Partagos</span>
-            <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300">
-              AI Parts Platform
-            </span>
+      <header style={styles.header}>
+        <div style={styles.headerInner}>
+          <div style={styles.brand}>
+            <div style={styles.logo} />
+            <div>
+              <strong>Partagos</strong>
+              <div style={styles.tag}>AI Parts Platform</div>
+            </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm text-neutral-300">
-            <a href="#features" className="hover:text-white">Features</a>
-            <a href="#search" className="hover:text-white">Zoeken</a>
-            <a href="#vendors" className="hover:text-white">Vendors</a>
-            <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a href="#contact" className="hover:text-white">Contact</a>
+          <nav style={styles.nav}>
+            <a href="#features">Features</a>
+            <a href="#search">Zoeken</a>
+            <a href="#vendors">Vendors</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#contact">Contact</a>
           </nav>
 
-          {/* LOGIN KNOP */}
-          <a
-            href="/login"
-            className="inline-flex items-center gap-2 text-sm bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-4 py-2 rounded-xl"
-          >
+          <a href="/login" style={styles.loginBtn}>
             Inloggen
           </a>
         </div>
       </header>
 
       {/* HERO */}
-      <section className="relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.15),transparent_50%)]" />
-        <div className="max-w-7xl mx-auto px-4 pt-16 pb-12 grid md:grid-cols-2 gap-10 items-center">
+      <section style={styles.hero}>
+        <div style={styles.heroInner}>
           <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
-              Eén platform voor{" "}
-              <span className="text-emerald-400">auto-onderdelenbeheer</span> én{" "}
-              <span className="text-emerald-400">verkoop</span>
+            <h1 style={styles.h1}>
+              Eén platform voor <span style={styles.green}>auto-onderdelenbeheer</span> én{" "}
+              <span style={styles.green}>verkoop</span>
             </h1>
-
-            <p className="mt-4 text-neutral-300 text-lg">
-              Partagos combineert flexibel magazijnbeheer met een centrale
-              zoekpool waarin de voorraad van aangesloten bedrijven samenkomt.
-              Consumentenprijzen zijn openbaar, B2B en export lopen via offerte
-              of contact.
+            <p style={styles.lead}>
+              Partagos combineert flexibel magazijnbeheer met een centrale zoekpool
+              waarin de voorraad van aangesloten bedrijven samenkomt.
+              Consumentenprijzen zijn openbaar.
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <a
-                href="mailto:demo@partagos.nl"
-                className="px-5 py-3 rounded-xl bg-white text-black font-semibold hover:opacity-90"
-              >
+            <div style={styles.ctaRow}>
+              <a href="mailto:demo@partagos.nl" style={styles.primaryBtn}>
                 Demo aanvragen
               </a>
-              <a
-                href="#features"
-                className="px-5 py-3 rounded-xl bg-neutral-900 border border-neutral-700 hover:border-neutral-500"
-              >
+              <a href="#features" style={styles.secondaryBtn}>
                 Bekijk features
               </a>
             </div>
           </div>
 
           {/* SEARCH MOCK */}
-          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-5">
-            <div className="rounded-xl border border-neutral-800 overflow-hidden">
-              <div className="px-4 py-3 bg-neutral-950 text-neutral-300 flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                Demo zoeken
-              </div>
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>Demo zoeken</div>
+            <div style={styles.cardBody} id="search">
+              <input
+                style={styles.input}
+                placeholder="Zoek op kenteken, VIN, motorcode, bakcode…"
+              />
+              <button style={styles.searchBtn}>Zoek</button>
 
-              <div className="p-4" id="search">
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-950 px-4 py-3">
-                  <Search className="w-5 h-5 text-neutral-400" />
-                  <input
-                    className="bg-transparent outline-none w-full text-neutral-200 placeholder:text-neutral-500"
-                    placeholder="Zoek op kenteken, VIN, motorcode, bakcode…"
-                  />
-                  <button className="px-3 py-1.5 text-sm rounded-lg bg-emerald-500 text-black font-medium">
-                    Zoek
-                  </button>
-                </div>
-
-                <div className="mt-4 rounded-xl border border-neutral-800 bg-neutral-950 p-4">
-                  <div className="font-medium">
-                    Versnellingsbak DQ400 • bakcode RJW
-                  </div>
-                  <div className="text-sm text-neutral-400">
-                    OE: 0DD300045K · Voorraad: 1 · Prijs: €349
-                  </div>
+              <div style={styles.result}>
+                <strong>Versnellingsbak DQ400 • RJW</strong>
+                <div style={styles.resultMeta}>
+                  OE: 0DD300045K • Voorraad: 1 • Prijs: €349
                 </div>
               </div>
             </div>
@@ -119,86 +74,196 @@ export default function App() {
       </section>
 
       {/* FEATURES */}
-      <section id="features" className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl md:text-3xl font-bold">
-          Gebouwd voor de praktijk
-        </h2>
-        <p className="mt-2 text-neutral-300">
-          SaaS-platform met operationele diepgang voor onderdelenbedrijven.
-        </p>
+      <section id="features" style={styles.section}>
+        <h2>Gebouwd voor de praktijk</h2>
+        <p>SaaS-platform met operationele diepgang voor onderdelenbedrijven.</p>
 
-        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Feature icon={<Boxes />} title="Centrale onderdelenpool" />
-          <Feature icon={<QrCode />} title="Labels & QR-codes" />
-          <Feature icon={<Cpu />} title="AI ondersteuning" />
-          <Feature icon={<Truck />} title="Export & verzending" />
-          <Feature icon={<ShieldCheck />} title="Rollen & rechten" />
-          <Feature icon={<Receipt />} title="Offertes & facturen" />
-          <Feature icon={<Rocket />} title="Schaalbaar SaaS" />
-          <Feature icon={<Globe2 />} title="Meertalig & multi-tenant" />
+        <div style={styles.features}>
+          {[
+            "Centrale onderdelenpool",
+            "Magazijn & labels",
+            "QR-codes",
+            "AI ondersteuning",
+            "Export & verzending",
+            "Rollen & rechten",
+            "Offertes & facturen",
+            "Schaalbaar SaaS",
+          ].map((f) => (
+            <div key={f} style={styles.featureCard}>
+              {f}
+            </div>
+          ))}
         </div>
       </section>
 
       {/* VENDORS */}
-      <section id="vendors" className="max-w-7xl mx-auto px-4 py-12">
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <Store /> Vendor portal
-          </h3>
-          <p className="mt-2 text-neutral-300">
-            Leveranciers beheren hun eigen voorraad, die automatisch in de
-            centrale pool verschijnt.
-          </p>
-        </div>
+      <section id="vendors" style={styles.sectionAlt}>
+        <h2>Vendor portal</h2>
+        <p>
+          Leveranciers beheren hun eigen voorraad die automatisch verschijnt in
+          de centrale pool.
+        </p>
       </section>
 
       {/* PRICING */}
-      <section id="pricing" className="max-w-7xl mx-auto px-4 py-12">
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6">
-          <h3 className="text-xl font-bold">Abonnementen</h3>
-          <p className="mt-2 text-neutral-400 text-sm">
-            Onderdeelprijzen zijn openbaar. Platformprijzen zijn op aanvraag.
-          </p>
-        </div>
+      <section id="pricing" style={styles.section}>
+        <h2>Abonnementen</h2>
+        <p>
+          Onderdeelprijzen zijn openbaar. Platformprijzen zijn op aanvraag.
+        </p>
       </section>
 
       {/* CONTACT */}
-      <section id="contact" className="max-w-7xl mx-auto px-4 py-12">
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6">
-          <h3 className="text-xl font-bold">Contact</h3>
-          <p className="mt-1 text-neutral-300">
-            Neem contact op of vraag een demo aan.
-          </p>
-          <div className="mt-4 flex gap-3">
-            <a
-              href="mailto:demo@partagos.nl"
-              className="px-5 py-3 rounded-xl bg-emerald-500 text-black font-semibold"
-            >
-              Demo aanvragen
-            </a>
-            <a
-              href="mailto:info@partagos.nl"
-              className="px-5 py-3 rounded-xl border border-neutral-700"
-            >
-              Contact
-            </a>
-          </div>
+      <section id="contact" style={styles.sectionAlt}>
+        <h2>Contact</h2>
+        <p>Vraag een demo aan of neem contact met ons op.</p>
+
+        <div style={styles.ctaRow}>
+          <a href="mailto:demo@partagos.nl" style={styles.primaryBtn}>
+            Demo aanvragen
+          </a>
+          <a href="mailto:info@partagos.nl" style={styles.secondaryBtn}>
+            Contact
+          </a>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-neutral-800 py-6 text-center text-sm text-neutral-400">
+      <footer style={styles.footer}>
         © {new Date().getFullYear()} Partagos.nl — AI-gedreven auto-onderdelenplatform
       </footer>
     </div>
   );
 }
 
-function Feature({ icon, title }) {
-  return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4 flex items-center gap-3">
-      <div className="text-emerald-400">{icon}</div>
-      <div className="font-medium">{title}</div>
-    </div>
-  );
-}
+const styles = {
+  page: {
+    fontFamily: "Arial, sans-serif",
+    color: "#0b0f14",
+  },
+  header: {
+    position: "sticky",
+    top: 0,
+    background: "#fff",
+    borderBottom: "1px solid #e5e7eb",
+    zIndex: 10,
+  },
+  headerInner: {
+    maxWidth: 1100,
+    margin: "0 auto",
+    padding: "12px 20px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  brand: { display: "flex", gap: 10, alignItems: "center" },
+  logo: {
+    width: 14,
+    height: 14,
+    borderRadius: 99,
+    background: "#16a34a",
+  },
+  tag: { fontSize: 11, opacity: 0.6 },
+  nav: {
+    display: "flex",
+    gap: 14,
+  },
+  loginBtn: {
+    background: "#16a34a",
+    color: "#fff",
+    padding: "8px 14px",
+    borderRadius: 8,
+    textDecoration: "none",
+    fontWeight: 600,
+  },
+  hero: {
+    background: "#f8fafc",
+    padding: "60px 20px",
+  },
+  heroInner: {
+    maxWidth: 1100,
+    margin: "0 auto",
+    display: "grid",
+    gridTemplateColumns: "1.2fr 0.8fr",
+    gap: 30,
+  },
+  h1: { fontSize: 36, marginBottom: 12 },
+  green: { color: "#16a34a" },
+  lead: { fontSize: 16, lineHeight: 1.6 },
+  ctaRow: { display: "flex", gap: 12, marginTop: 16 },
+  primaryBtn: {
+    background: "#16a34a",
+    color: "#fff",
+    padding: "10px 18px",
+    borderRadius: 8,
+    textDecoration: "none",
+    fontWeight: 600,
+  },
+  secondaryBtn: {
+    border: "1px solid #d1d5db",
+    padding: "10px 18px",
+    borderRadius: 8,
+    textDecoration: "none",
+    color: "#0b0f14",
+  },
+  card: {
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    background: "#fff",
+  },
+  cardHeader: {
+    padding: 12,
+    borderBottom: "1px solid #e5e7eb",
+    fontWeight: 600,
+  },
+  cardBody: { padding: 12 },
+  input: {
+    width: "100%",
+    padding: 10,
+    marginBottom: 10,
+  },
+  searchBtn: {
+    background: "#16a34a",
+    color: "#fff",
+    padding: "8px 14px",
+    borderRadius: 6,
+    border: "none",
+    cursor: "pointer",
+  },
+  result: {
+    marginTop: 12,
+    padding: 10,
+    border: "1px solid #e5e7eb",
+    borderRadius: 8,
+  },
+  resultMeta: { fontSize: 13, opacity: 0.7 },
+  section: {
+    maxWidth: 1100,
+    margin: "0 auto",
+    padding: "60px 20px",
+  },
+  sectionAlt: {
+    background: "#f8fafc",
+    padding: "60px 20px",
+  },
+  features: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+    gap: 12,
+    marginTop: 20,
+  },
+  featureCard: {
+    border: "1px solid #e5e7eb",
+    padding: 16,
+    borderRadius: 10,
+    background: "#fff",
+  },
+  footer: {
+    borderTop: "1px solid #e5e7eb",
+    padding: 20,
+    textAlign: "center",
+    fontSize: 13,
+    opacity: 0.7,
+  },
+};
